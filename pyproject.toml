@@ -1,0 +1,10 @@
+[project]
+name = "yet-another-rag"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "docling>=2.108.0",
+    "easyocr>=1.7.2",
+]
