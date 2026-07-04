@@ -1,13 +1,5 @@
-from dataclasses import dataclass
 from pathlib import Path
-
-
-@dataclass(slots=True)
-class RawDocument:
-    path: Path
-    filename: str
-    extension: str
-    size: int
+from models.document import RawDocument
 
 
 class DocumentLoader:
@@ -52,4 +44,3 @@ class DocumentLoader:
             )
 
         return sorted(documents, key=lambda doc: doc.path)
-

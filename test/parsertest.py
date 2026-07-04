@@ -18,7 +18,7 @@ def main():
         parsed = parser.parse(document)
 
         print("-" * 80)
-        print(parsed.text[:1000])  # First 1000 characters
+        print(parsed.markdown[:1000])  # First 1000 characters
         print("-" * 80)
         print(parsed.metadata)
 

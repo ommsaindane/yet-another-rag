@@ -1,5 +1,4 @@
-from dataclasses import dataclass
-from pathlib import Path
+from uuid import uuid4
 
 from docling.datamodel.base_models import InputFormat
 from docling.datamodel.pipeline_options import (
@@ -10,16 +9,9 @@ from docling.document_converter import (
     DocumentConverter,
     PdfFormatOption,
 )
-from docling_core.types.doc import DoclingDocument
 
 from ingestion.loader import RawDocument
-
-
-@dataclass(slots=True)
-class ParsedDocument:
-    markdown: str
-    metadata: dict
-    docling_document: DoclingDocument
+from models.document import ParsedDocument
 
 
 class DoclingParser:
@@ -27,7 +19,7 @@ class DoclingParser:
 
         pdf_options = PdfPipelineOptions()
 
-        pdf_options.do_ocr = True
+        pdf_options.do_ocr = False
         pdf_options.ocr_options = EasyOcrOptions()
 
         self.converter = DocumentConverter(
@@ -43,6 +35,7 @@ class DoclingParser:
         doc = result.document
 
         return ParsedDocument(
+            id=str(uuid4()),
             markdown=doc.export_to_markdown(),
             metadata={
                 "filename": document.filename,
