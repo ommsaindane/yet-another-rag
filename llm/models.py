@@ -1,27 +1,14 @@
-from transformers import (
-    AutoModelForCausalLM,
-    AutoTokenizer,
-    pipeline,
-)
+from ollama import Client
 
 
 class LlamaModel:
     def __init__(
         self,
-        model_name: str = "meta-llama/Llama-3.2-3B-Instruct",
+        model_name: str = "llama3.2:3b",
+        host: str = "http://localhost:11434",
     ):
-        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
-
-        self.model = AutoModelForCausalLM.from_pretrained(
-            model_name,
-            device_map="auto",
-        )
-
-        self.pipeline = pipeline(
-            task="text-generation",
-            model=self.model,
-            tokenizer=self.tokenizer,
-        )
+        self.model_name = model_name
+        self.client = Client(host=host)
 
     def generate(
         self,
@@ -31,28 +18,22 @@ class LlamaModel:
         temperature: float = 0.2,
     ) -> str:
 
-        messages = [
-            {
-                "role": "system",
-                "content": system_prompt,
+        response = self.client.chat(
+            model=self.model_name,
+            messages=[
+                {
+                    "role": "system",
+                    "content": system_prompt,
+                },
+                {
+                    "role": "user",
+                    "content": user_prompt,
+                },
+            ],
+            options={
+                "temperature": temperature,
+                "num_predict": max_new_tokens,
             },
-            {
-                "role": "user",
-                "content": user_prompt,
-            },
-        ]
-
-        outputs = self.pipeline(
-            messages,
-            max_new_tokens=max_new_tokens,
-            temperature=temperature,
-            do_sample=temperature > 0,
         )
 
-        generated = outputs[0]["generated_text"]
-
-        if isinstance(generated, list):
-            return generated[-1]["content"].strip()
-
-        return generated.strip()
-
+        return response["message"]["content"].strip()
