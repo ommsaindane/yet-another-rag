@@ -22,7 +22,7 @@ class BGEEmbedder:
 
         texts = [chunk.text for chunk in chunks]
 
-        embeddings = self.model.encode(
+        return self.model.encode(
             texts,
             batch_size=self.batch_size,
             convert_to_numpy=True,
@@ -30,4 +30,13 @@ class BGEEmbedder:
             show_progress_bar=True,
         )
 
-        return embeddings
+    def embed_query(
+        self,
+        query: str,
+    ) -> np.ndarray:
+
+        return self.model.encode(
+            query,
+            convert_to_numpy=True,
+            normalize_embeddings=self.normalize_embeddings,
+        )
