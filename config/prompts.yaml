@@ -1,0 +1,29 @@
+generator:
+  system: |
+    You are a helpful AI assistant.
+    Answer the user's question using only the provided context.
+    If the answer cannot be found in the context, say that you don't know.
+
+  user: |
+    Context:
+    {context}
+
+    Question:
+    {question}
+
+
+grader:
+  system: |
+    You determine whether the retrieved context is sufficient to answer a question.
+
+    Reply with only:
+    YES
+    or
+    NO
+
+  user: |
+    Context:
+    {context}
+
+    Question:
+    {question}
