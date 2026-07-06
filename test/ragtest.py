@@ -15,6 +15,8 @@ from retrieval.pipeline import RetrievalPipeline
 from llm.models import LlamaModel
 from llm.prompts import PromptManager
 
+from web.search import DuckDuckGoSearch
+
 from agent.graph import CRAGGraph
 
 
@@ -26,7 +28,6 @@ def build_rag():
     parsed_documents = ingestion.run()
 
     print(f"Loaded {len(parsed_documents)} documents.")
-
     print()
 
     print("Chunking...")
@@ -37,7 +38,6 @@ def build_rag():
 
     print(f"{len(parent_chunks)} parent chunks")
     print(f"{len(child_chunks)} child chunks")
-
     print()
 
     print("Embedding...")
@@ -88,13 +88,14 @@ def build_rag():
     print("Loading LLM...")
 
     llm = LlamaModel()
-
     prompts = PromptManager()
+    web_search = DuckDuckGoSearch()
 
     graph = CRAGGraph(
         retrieval=retrieval,
         llm=llm,
         prompts=prompts,
+        web_search=web_search,
     )
 
     return graph
@@ -123,3 +124,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

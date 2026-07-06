@@ -1,6 +1,6 @@
 from models.web import WebResult
 
-from duckduckgo_search import DDGS
+from ddgs import DDGS
 
 
 class DuckDuckGoSearch:
@@ -19,7 +19,7 @@ class DuckDuckGoSearch:
 
         with DDGS() as ddgs:
             response = ddgs.text(
-                keywords=query,
+                query=query,
                 max_results=self.max_results,
             )
 

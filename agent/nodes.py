@@ -18,7 +18,7 @@ class AgentNodes:
         self.retrieval = retrieval
         self.llm = llm
         self.prompts = prompts
-        self.web_search = web_search
+        self.search_engine = web_search
 
     def retrieve(
         self,
@@ -67,7 +67,7 @@ class AgentNodes:
         state: AgentState,
     ) -> AgentState:
 
-        state["web_results"] = self.web_search.search(
+        state["web_results"] = self.search_engine.search(
             state["query"],
         )
 
