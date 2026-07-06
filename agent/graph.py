@@ -9,6 +9,8 @@ from llm.prompts import PromptManager
 
 from retrieval.pipeline import RetrievalPipeline
 
+from web.search import DuckDuckGoSearch
+
 
 class CRAGGraph:
     def __init__(
@@ -16,11 +18,13 @@ class CRAGGraph:
         retrieval: RetrievalPipeline,
         llm: LlamaModel,
         prompts: PromptManager,
+        web_search: DuckDuckGoSearch,
     ):
         nodes = AgentNodes(
             retrieval=retrieval,
             llm=llm,
             prompts=prompts,
+            web_search=web_search,
         )
 
         builder = StateGraph(AgentState)
@@ -29,15 +33,30 @@ class CRAGGraph:
         # Nodes
         #
 
-        builder.add_node("retrieve", nodes.retrieve)
+        builder.add_node(
+            "retrieve",
+            nodes.retrieve,
+        )
 
-        builder.add_node("grade_context", nodes.grade_context)
+        builder.add_node(
+            "grade_context",
+            nodes.grade_context,
+        )
 
-        builder.add_node("web_search", nodes.web_search)
+        builder.add_node(
+            "web_search",
+            nodes.web_search,
+        )
 
-        builder.add_node("build_context", nodes.build_context)
+        builder.add_node(
+            "build_context",
+            nodes.build_context,
+        )
 
-        builder.add_node("generate", nodes.generate)
+        builder.add_node(
+            "generate",
+            nodes.generate,
+        )
 
         #
         # Edges

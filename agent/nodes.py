@@ -4,6 +4,8 @@ from llm.models import LlamaModel
 from llm.prompts import PromptManager
 from retrieval.pipeline import RetrievalPipeline
 
+from web.search import DuckDuckGoSearch
+
 
 class AgentNodes:
     def __init__(
@@ -11,10 +13,12 @@ class AgentNodes:
         retrieval: RetrievalPipeline,
         llm: LlamaModel,
         prompts: PromptManager,
+        web_search: DuckDuckGoSearch,
     ):
         self.retrieval = retrieval
         self.llm = llm
         self.prompts = prompts
+        self.web_search = web_search
 
     def retrieve(
         self,
@@ -63,7 +67,9 @@ class AgentNodes:
         state: AgentState,
     ) -> AgentState:
 
-        state["web_results"] = []
+        state["web_results"] = self.web_search.search(
+            state["query"],
+        )
 
         return state
 
@@ -74,13 +80,13 @@ class AgentNodes:
 
         context_parts: list[str] = []
 
-        if state["context_is_relevant"]:
-            context_parts.extend(chunk.text for chunk in state["retrieved_parents"])
+        context_parts.extend(chunk.text for chunk in state["retrieved_parents"])
 
-            context_parts.extend(
-                f"{result.title}\n{result.snippet}" for result in state["web_results"]
-            )
-            state["context"] = "\n\n".join(context_parts)
+        context_parts.extend(
+            f"{result.title}\n{result.snippet}" for result in state["web_results"]
+        )
+
+        state["context"] = "\n\n".join(context_parts)
 
         return state
 
