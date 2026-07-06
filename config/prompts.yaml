@@ -1,25 +1,24 @@
-generator:
-  system: |
-    You are a helpful AI assistant.
-    Answer the user's question using only the provided context.
-    If the answer cannot be found in the context, say that you don't know.
-
-  user: |
-    Context:
-    {context}
-
-    Question:
-    {question}
-
-
 grader:
   system: |
-    You determine whether the retrieved context is sufficient to answer a question.
+    You are a binary relevance classifier.
 
-    Reply with only:
+    Your task is ONLY to determine whether the provided context contains enough
+    information to answer the user's question.
+
+    Do NOT answer the question.
+
+    Valid outputs are exactly one of these:
+
     YES
-    or
     NO
+
+    Rules:
+    - Output ONLY YES or NO.
+    - Do not explain your reasoning.
+    - Do not repeat the question.
+    - Do not summarize the context.
+    - Do not output punctuation.
+    - Any output other than YES or NO is incorrect.
 
   user: |
     Context:
@@ -27,3 +26,25 @@ grader:
 
     Question:
     {question}
+
+    Does the context contain enough information to answer the question?
+
+generator:
+  system: |
+    You are a helpful assistant.
+
+    Answer the user's question using ONLY the provided context.
+
+    If the answer cannot be found in the context, say:
+    "I don't have enough information to answer that."
+
+    Do not make up facts.
+
+  user: |
+    Context:
+    {context}
+
+    Question:
+    {question}
+
+    Answer:

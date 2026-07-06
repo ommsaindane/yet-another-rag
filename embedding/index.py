@@ -17,7 +17,7 @@ class Indexer:
         if len(chunks) != len(embeddings):
             raise ValueError("Number of chunks should match the number of embeddings.")
 
-        self.vector_store.add(
+        self.vector_store.upsert(
             ids=[chunk.id for chunk in chunks],
             embeddings=embeddings,
             documents=[chunk.text for chunk in chunks],

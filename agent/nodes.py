@@ -49,7 +49,12 @@ class AgentNodes:
             .upper()
         )
 
-        state["context_is_relevant"] = response.startswith("YES")
+        if response == "YES":
+            state["context_is_relevant"] = True
+        elif response == "NO":
+            state["context_is_relevant"] = False
+        else:
+            raise ValueError(f"Invalid grader output: {response}")
 
         return state
 

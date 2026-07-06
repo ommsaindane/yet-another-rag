@@ -25,10 +25,14 @@ class EmbeddingPipeline:
     def run(
         self,
         child_chunks: list[ChildChunk],
+        overwrite: bool = False,
     ) -> None:
 
         if not child_chunks:
             return
+
+        if overwrite:
+            self.vector_store.delete()
 
         embeddings = self.embedder.embed(child_chunks)
 

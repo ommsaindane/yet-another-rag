@@ -21,7 +21,7 @@ class ChromaVectorStore:
             },
         )
 
-    def add(
+    def upsert(
         self,
         ids: list[str],
         embeddings: NDArray,
@@ -29,7 +29,7 @@ class ChromaVectorStore:
         metadatas: list[dict[str, Any]],
     ) -> None:
 
-        self.collection.add(
+        self.collection.upsert(
             ids=ids,
             embeddings=embeddings.tolist(),
             documents=documents,

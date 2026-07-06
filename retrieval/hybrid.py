@@ -5,10 +5,6 @@ from retrieval.vector import VectorRetriever
 
 
 class HybridRetriever:
-    """
-    Combines dense and sparse retrieval using Reciprocal Rank Fusion (RRF).
-    """
-
     def __init__(
         self,
         vector_retriever: VectorRetriever,
@@ -24,9 +20,6 @@ class HybridRetriever:
         query: str,
         k: int = 10,
     ) -> list[ChildChunk]:
-        """
-        Retrieve the top-k child chunks using Reciprocal Rank Fusion.
-        """
 
         vector_results = self.vector_retriever.retrieve(
             query=query,

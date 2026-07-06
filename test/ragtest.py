@@ -47,7 +47,10 @@ def build_rag():
         collection_name="papers",
     )
 
-    embedding.run(child_chunks)
+    embedding.run(
+        child_chunks,
+        overwrite=True,
+    )
 
     print("Building retrieval...")
 
