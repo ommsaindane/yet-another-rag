@@ -6,14 +6,13 @@ A Corrective RAG (CRAG) pipeline that performs hybrid retrieval, reranking, cont
 
 # Table of Contents
 
-- Architecture
-- Features
-- Tech Stack
-- Project Structure
-- Getting Started
-- Usage
-- API
-- Roadmap
+- [Architecture](#architecture)
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Getting Started](#getting-started)
+- [Usage](#usage)
+- [API](#api)
+- [Roadmap](#roadmap)
 
 ---
 
