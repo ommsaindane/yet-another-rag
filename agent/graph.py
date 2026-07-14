@@ -110,6 +110,7 @@ class CRAGGraph:
                 "context_is_relevant": False,
                 "web_results": [],
                 "context": "",
+                "retrieved_contexts": [],
                 "answer": "",
             }
         )

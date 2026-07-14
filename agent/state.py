@@ -38,7 +38,7 @@ class AgentState(TypedDict):
     #
 
     context: str
-
+    retrieved_contexts: list[str]
     #
     # Output
     #

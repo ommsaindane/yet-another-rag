@@ -1,0 +1,102 @@
+[
+  {
+    "id": 1,
+    "question": "What problem does G-RRM aim to solve?",
+    "expected_answer": "G-RRM combines recurrent reasoning models with symbolic solvers to improve search efficiency while preserving the correctness guarantees of symbolic solving."
+  },
+  {
+    "id": 2,
+    "question": "Why can't recurrent reasoning models guarantee correct solutions by themselves?",
+    "expected_answer": "RRMs generate complete solution proposals through learned iterative refinement but do not perform deductive reasoning or logical verification, so they may produce constraint-violating solutions."
+  },
+  {
+    "id": 3,
+    "question": "What role does the SE-RRM play in G-RRM?",
+    "expected_answer": "The SE-RRM predicts probability distributions over candidate assignments that guide the search order of symbolic solvers."
+  },
+  {
+    "id": 4,
+    "question": "Why is Sudoku used as the benchmark in this work?",
+    "expected_answer": "Sudoku is a well-established combinatorial constraint satisfaction benchmark with simple rules but computationally difficult search, making it suitable for evaluating neuro-symbolic methods."
+  },
+  {
+    "id": 5,
+    "question": "How does G-RRM preserve solver correctness?",
+    "expected_answer": "The neural model only changes the search order while the symbolic solver still explores all feasible assignments, preserving completeness and correctness."
+  },
+  {
+    "id": 6,
+    "question": "What are the two conditions under which G-RRM provides significant speedups?",
+    "expected_answer": "The search space must dominate runtime and the symbolic solver must be capable of overwriting incorrect neural guidance during search."
+  },
+  {
+    "id": 7,
+    "question": "What heuristic is used for selecting cells in guided backtracking?",
+    "expected_answer": "The minimum remaining values heuristic is used to select the empty cell with the fewest valid candidate digits."
+  },
+  {
+    "id": 8,
+    "question": "How does G-RRM guide CDCL SAT solvers?",
+    "expected_answer": "It initializes Boolean variable phases using the highest-scoring predictions produced by the SE-RRM."
+  },
+  {
+    "id": 9,
+    "question": "Why does Glucose benefit more from neural guidance than CaDiCaL?",
+    "expected_answer": "Glucose can override incorrect neural hints during restarts, whereas CaDiCaL tends to preserve externally supplied phases and is dominated by solver overhead."
+  },
+  {
+    "id": 10,
+    "question": "What was the reported median speedup for backtracking on 9×9 Sudoku?",
+    "expected_answer": "Approximately 33.3×."
+  },
+  {
+    "id": 11,
+    "question": "What limitation of vanilla recurrent reasoning models is addressed by SE-RRM?",
+    "expected_answer": "Vanilla RRMs cannot naturally extrapolate to unseen symbols because they rely on fixed symbol embeddings, whereas SE-RRM introduces symbol equivariance."
+  },
+  {
+    "id": 12,
+    "question": "What is the Solve-Learn-Extrapolate strategy proposed for future work?",
+    "expected_answer": "Solve small problems exactly, train an SE-RRM on those solutions, and use it to guide symbolic solving on larger problems before repeating the process."
+  },
+  {
+    "id": 13,
+    "question": "Which solver showed a statistically significant slowdown with G-RRM?",
+    "expected_answer": "CaDiCaL."
+  },
+  {
+    "id": 14,
+    "question": "What metric is used to report the percentage of puzzles solved directly by the neural model?",
+    "expected_answer": "Fully Solved Rate (FSR)."
+  },
+  {
+    "id": 15,
+    "question": "Why is SE-RRM suitable for extrapolating to larger Sudoku sizes?",
+    "expected_answer": "Its symbol-equivariant architecture allows meaningful predictions even when the symbol set changes."
+  },
+  {
+    "id": 16,
+    "question": "What is Retrieval-Augmented Generation?",
+    "expected_answer": ""
+  },
+  {
+    "id": 17,
+    "question": "Who invented the Transformer architecture?",
+    "expected_answer": ""
+  },
+  {
+    "id": 18,
+    "question": "What is the capital of Germany?",
+    "expected_answer": ""
+  },
+  {
+    "id": 19,
+    "question": "How many parameters does GPT-4 have?",
+    "expected_answer": ""
+  },
+  {
+    "id": 20,
+    "question": "What is quantum entanglement?",
+    "expected_answer": ""
+  }
+]

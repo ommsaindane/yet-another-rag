@@ -86,6 +86,7 @@ class AgentNodes:
             f"{result.title}\n{result.snippet}" for result in state["web_results"]
         )
 
+        state["retrieved_contexts"] = context_parts
         state["context"] = "\n\n".join(context_parts)
 
         return state
