@@ -1,5 +1,3 @@
-from typing import Optional
-
 from deepeval.models import DeepEvalBaseLLM
 
 from llm.models import LlamaModel
@@ -11,29 +9,28 @@ class OllamaDeepEvalModel(DeepEvalBaseLLM):
         model_name: str = "llama3.2:3b",
         host: str = "http://localhost:11434",
     ):
-        self.model_name = model_name
-        self.host = host
-        self._model: Optional[LlamaModel] = None
+        self.model = LlamaModel(
+            model_name=model_name,
+            host=host,
+        )
 
-    def load_model(self) -> LlamaModel:
-        if self._model is None:
-            self._model = LlamaModel(
-                model_name=self.model_name,
-                host=self.host,
-            )
-        return self._model
+    def load_model(self):
+        return self.model
 
     def generate(
         self,
         prompt: str,
         schema=None,
     ):
-        model = self.load_model()
 
-        response = model.generate(
-            system_prompt="You are a helpful evaluation assistant.",
+        response = self.model.generate(
+            system_prompt=(
+                "You are an evaluation model. Respond ONLY with valid JSON."
+            ),
             user_prompt=prompt,
             temperature=0.0,
+            max_new_tokens=4096,
+            format=schema.model_json_schema() if schema else None,
         )
 
         if schema is not None:
@@ -46,11 +43,11 @@ class OllamaDeepEvalModel(DeepEvalBaseLLM):
         prompt: str,
         schema=None,
     ):
-        # Ollama client is synchronous, so reuse generate().
         return self.generate(
             prompt=prompt,
             schema=schema,
         )
 
     def get_model_name(self) -> str:
-        return self.model_name
+        return self.model.model_name
+

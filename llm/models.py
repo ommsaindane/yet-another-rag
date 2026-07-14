@@ -14,8 +14,9 @@ class LlamaModel:
         self,
         system_prompt: str,
         user_prompt: str,
-        max_new_tokens: int = 512,
+        max_new_tokens: int = 1024,
         temperature: float = 0.2,
+        format: dict | None = None,
     ) -> str:
 
         response = self.client.chat(
@@ -34,6 +35,7 @@ class LlamaModel:
                 "temperature": temperature,
                 "num_predict": max_new_tokens,
             },
+            format=format if format is not None else "",
         )
 
         return response["message"]["content"].strip()

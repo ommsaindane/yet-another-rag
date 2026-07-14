@@ -18,40 +18,67 @@ from llm.prompts import PromptManager
 from web.search import DuckDuckGoSearch
 
 from agent.graph import CRAGGraph
+from storage.manifest import Manifest
+from storage.child_store import ChildStore
 
 
 def build_rag():
 
-    print("Ingesting documents...")
+    manifest = Manifest("data/raw")
 
-    ingestion = IngestionPipeline("data/raw")
-    parsed_documents = ingestion.run()
+    parent_store = ParentStore()
+    child_store = ChildStore()
 
-    print(f"Loaded {len(parsed_documents)} documents.")
+    if manifest.documents_changed():
+        print("Changes detected. Rebuilding index...")
+        print("Ingesting documents...")
+
+        ingestion = IngestionPipeline("data/raw")
+        parsed_documents = ingestion.run()
+
+        print(f"Loaded {len(parsed_documents)} documents.")
+        print()
+
+        print("Chunking...")
+
+        chunking = ChunkingPipeline()
+
+        parent_chunks, child_chunks = chunking.run(parsed_documents)
+
+        print(f"{len(parent_chunks)} parent chunks")
+        print(f"{len(child_chunks)} child chunks")
+        print()
+
+        print("Embedding...")
+
+        embedding = EmbeddingPipeline(
+            persist_directory="data/chroma",
+            collection_name="papers",
+        )
+
+        embedding.run(
+            child_chunks,
+            overwrite=False,
+        )
+
+        parent_store.add(parent_chunks)
+        child_store.add(child_chunks)
+
+        parent_store.save()
+        child_store.save()
+
+        manifest.save()
+
+    else:
+        print("No document changes detected.")
+        print("Skipping ingestion.")
+
+        parent_store.load()
+        child_store.load()
+
+        child_chunks = child_store.get()
+
     print()
-
-    print("Chunking...")
-
-    chunking = ChunkingPipeline()
-
-    parent_chunks, child_chunks = chunking.run(parsed_documents)
-
-    print(f"{len(parent_chunks)} parent chunks")
-    print(f"{len(child_chunks)} child chunks")
-    print()
-
-    print("Embedding...")
-
-    embedding = EmbeddingPipeline(
-        persist_directory="data/chroma",
-        collection_name="papers",
-    )
-
-    embedding.run(
-        child_chunks,
-        overwrite=True,
-    )
-
     print("Building retrieval...")
 
     vector_store = ChromaVectorStore(
@@ -75,9 +102,6 @@ def build_rag():
     )
 
     reranker = BGEReranker()
-
-    parent_store = ParentStore()
-    parent_store.add(parent_chunks)
 
     retrieval = RetrievalPipeline(
         hybrid_retriever=hybrid,
@@ -124,4 +148,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
