@@ -17,3 +17,15 @@ data/chroma/*
 .env
 .env.local
 .env.*.local
+
+# Local documents
+data/raw/
+
+# Generated vector database and indexes
+data/chroma/
+data/indexes/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
