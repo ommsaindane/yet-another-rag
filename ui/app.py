@@ -1,5 +1,6 @@
 import json
 import os
+from html import escape
 from pathlib import Path
 from typing import Any, Iterator
 
@@ -14,7 +15,7 @@ RAW_DATA_DIR = Path(os.getenv("RAW_DATA_DIR", "data/raw"))
 SUPPORTED_EXTENSIONS = {".pdf", ".docx", ".pptx", ".xlsx", ".md", ".txt", ".html"}
 
 st.set_page_config(
-    page_title="YARAG // Corrective RAG Console",
+    page_title="Yet Another RAG",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -40,6 +41,31 @@ st.markdown(
         border-bottom: 1px solid rgba(128, 128, 128, 0.25);
         padding-bottom: 0.5rem;
         margin-bottom: 1.25rem;
+    }
+    [data-testid="stChatMessage"] [data-testid*="Avatar"],
+    [data-testid="stChatMessage"] > div:first-child {
+        display: none !important;
+    }
+    [data-testid="stChatMessage"] {
+        background: transparent;
+        border: 0;
+    }
+    .user-query-row {
+        display: flex;
+        justify-content: flex-end;
+        width: 100%;
+        margin: 0.5rem 0 1rem;
+    }
+    .user-query-bubble {
+        display: inline-block;
+        width: fit-content;
+        max-width: min(75%, 800px);
+        padding: 0.7rem 1rem;
+        border: 1px solid rgba(128, 128, 128, 0.25);
+        border-radius: 1.25rem;
+        background: rgba(128, 128, 128, 0.12);
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
     }
     .telemetry-bar {
         font-family: 'JetBrains Mono', 'Fira Code', monospace;
@@ -186,6 +212,13 @@ def render_telemetry_and_sources(meta: dict[str, Any]) -> None:
                     )
 
 
+def render_user_query(query: str) -> None:
+    st.markdown(
+        f'<div class="user-query-row"><div class="user-query-bubble">{escape(query)}</div></div>',
+        unsafe_allow_html=True,
+    )
+
+
 # ---------------------------------------------------------------------------
 # Sidebar: System Control & Corpus Management
 # ---------------------------------------------------------------------------
@@ -255,27 +288,26 @@ with st.sidebar:
 # ---------------------------------------------------------------------------
 # Main Console: Query & Telemetry History
 # ---------------------------------------------------------------------------
-st.markdown(
-    '<div class="sys-header">CORRECTIVE RAG // QUERY CONSOLE</div>',
-    unsafe_allow_html=True,
-)
+st.title("Yet Another RAG")
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
 for msg in st.session_state.messages:
-    with st.chat_message(msg["role"], avatar=None):
-        st.markdown(msg["content"])
-        if msg["role"] == "assistant" and "meta" in msg:
-            render_telemetry_and_sources(msg["meta"])
+    if msg["role"] == "user":
+        render_user_query(msg["content"])
+    else:
+        with st.chat_message("assistant", avatar=None):
+            st.markdown(msg["content"])
+            if "meta" in msg:
+                render_telemetry_and_sources(msg["meta"])
 
 if prompt := st.chat_input(
     "Enter technical query...",
     disabled=not api_online,
 ):
     st.session_state.messages.append({"role": "user", "content": prompt})
-    with st.chat_message("user", avatar=None):
-        st.markdown(prompt)
+    render_user_query(prompt)
 
     with st.chat_message("assistant", avatar=None):
         stream_meta: dict[str, Any] = {
@@ -285,7 +317,10 @@ if prompt := st.chat_input(
             "latency": None,
         }
         try:
-            full_response = st.write_stream(stream_rag_query(prompt, stream_meta))
+            with st.spinner("Generating response..."):
+                full_response = st.write_stream(
+                    stream_rag_query(prompt, stream_meta)
+                )
             render_telemetry_and_sources(stream_meta)
             st.session_state.messages.append(
                 {
