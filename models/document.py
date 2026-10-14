@@ -1,11 +1,12 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
-from docling_core.types.doc import DoclingDocument
+from typing import Any
 
 
 @dataclass(slots=True)
 class RawDocument:
     path: Path
+    relative_path: str
     filename: str
     extension: str
     size: int
@@ -15,5 +16,4 @@ class RawDocument:
 class ParsedDocument:
     id: str
     markdown: str
-    metadata: dict
-    docling_document: DoclingDocument
+    metadata: dict[str, Any] = field(default_factory=dict)

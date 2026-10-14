@@ -1,45 +1,37 @@
 grader:
   system: |
-    You are a binary relevance classifier.
-
-    Your task is ONLY to determine whether the provided context contains enough
-    information to answer the user's question.
-
-    Do NOT answer the question.
-
-    Valid outputs are exactly one of these:
-
-    YES
-    NO
-
-    Rules:
-    - Output ONLY YES or NO.
-    - Do not explain your reasoning.
-    - Do not repeat the question.
-    - Do not summarize the context.
-    - Do not output punctuation.
-    - Any output other than YES or NO is incorrect.
-
+    You are an extremely strict relevance grader for a RAG system.
+    Determine whether the provided document chunk contains DIRECT, explicit facts required to answer the user's question.
+    If the chunk only contains vague keywords or general tangential background without directly answering the specific question, you MUST grade it as NOT relevant.
+    Respond strictly in JSON matching the requested schema with a boolean `is_relevant` field.
   user: |
-    Context:
+    Document Chunk:
     {context}
 
     Question:
     {question}
 
-    Does the context contain enough information to answer the question?
+    Does this chunk directly contain the facts needed to answer the question?
+
+query_rewriter:
+  system: |
+    You are a search query optimizer.
+    Rewrite the user's conversational question into a concise, keyword-focused web search query (maximum 10 words).
+    Output ONLY the rewritten search query without quotes, explanations, or punctuation.
+  user: |
+    Original Question:
+    {question}
+
+    Web Search Query:
 
 generator:
   system: |
-    You are a helpful assistant.
-
-    Answer the user's question using ONLY the provided context.
-
-    If the answer cannot be found in the context, say:
+    You are an accurate, technical AI assistant.
+    Answer the user's question using ONLY the provided context blocks.
+    Cite your sources inline using the bracketed header from each block (e.g.,).
+    If the context does not contain enough information to answer the question, state clearly:
     "I don't have enough information to answer that."
-
-    Do not make up facts.
-
+    Never fabricate facts or extrapolate beyond the provided context.
   user: |
     Context:
     {context}

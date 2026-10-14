@@ -1,11 +1,12 @@
+from fastapi import Request
 from agent.graph import CRAGGraph
 
-from api.startup import get_graph
 
-
-def graph_dependency() -> CRAGGraph:
+def graph_dependency(request: Request) -> CRAGGraph:
     """
-    FastAPI dependency that returns the shared CRAG graph instance.
+    FastAPI dependency that returns the shared CRAG graph instance from app.state.
     """
-    return get_graph()
-
+    graph: CRAGGraph | None = getattr(request.app.state, "graph", None)
+    if graph is None:
+        raise RuntimeError("CRAG graph has not been initialized.")
+    return graph

@@ -1,27 +1,30 @@
-from sentence_transformers import SentenceTransformer
 import numpy as np
-
+from sentence_transformers import SentenceTransformer
+from config.settings import get_settings
 from models.chunk import ChildChunk
 
 
 class BGEEmbedder:
     def __init__(
         self,
-        model_name: str = "BAAI/bge-small-en-v1.5",
-        batch_size: int = 64,
+        model_name: str | None = None,
+        batch_size: int | None = None,
         normalize_embeddings: bool = True,
+        device: str | None = None,
     ):
-        self.model = SentenceTransformer(model_name)
-        self.batch_size = batch_size
+        settings = get_settings()
+        self.model = SentenceTransformer(
+            model_name or settings.embedding_model,
+            device=device or settings.embedding_device,
+        )
+        self.batch_size = batch_size or settings.embedding_batch_size
         self.normalize_embeddings = normalize_embeddings
 
     def embed(
         self,
         chunks: list[ChildChunk],
     ) -> np.ndarray:
-
         texts = [chunk.text for chunk in chunks]
-
         return self.model.encode(
             texts,
             batch_size=self.batch_size,
@@ -34,7 +37,6 @@ class BGEEmbedder:
         self,
         query: str,
     ) -> np.ndarray:
-
         return self.model.encode(
             query,
             convert_to_numpy=True,

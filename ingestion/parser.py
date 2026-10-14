@@ -1,5 +1,3 @@
-from uuid import uuid4
-
 from docling.datamodel.base_models import InputFormat
 from docling.datamodel.pipeline_options import (
     EasyOcrOptions,
@@ -10,16 +8,14 @@ from docling.document_converter import (
     PdfFormatOption,
 )
 
-from ingestion.loader import RawDocument
-from models.document import ParsedDocument
+from models.document import ParsedDocument, RawDocument
+from storage.manifest import Manifest
 
 
 class DoclingParser:
-    def __init__(self):
-
+    def __init__(self, do_ocr: bool = False):
         pdf_options = PdfPipelineOptions()
-
-        pdf_options.do_ocr = False
+        pdf_options.do_ocr = do_ocr
         pdf_options.ocr_options = EasyOcrOptions()
 
         self.converter = DocumentConverter(
@@ -29,19 +25,25 @@ class DoclingParser:
         )
 
     def parse(self, document: RawDocument) -> ParsedDocument:
+        doc_id = Manifest.compute_document_id(document.relative_path)
 
-        result = self.converter.convert(str(document.path))
-
-        doc = result.document
+        if document.extension in {".md", ".txt"}:
+            markdown = document.path.read_text(encoding="utf-8", errors="replace")
+            page_count = 1
+        else:
+            result = self.converter.convert(str(document.path))
+            doc = result.document
+            markdown = doc.export_to_markdown()
+            page_count = len(getattr(doc, "pages", {})) or 1
 
         return ParsedDocument(
-            id=str(uuid4()),
-            markdown=doc.export_to_markdown(),
+            id=doc_id,
+            markdown=markdown,
             metadata={
                 "filename": document.filename,
+                "relative_path": document.relative_path,
                 "extension": document.extension,
                 "size": document.size,
-                "path": str(document.path),
+                "page_count": page_count,
             },
-            docling_document=doc,
         )

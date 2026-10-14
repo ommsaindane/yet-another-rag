@@ -1,10 +1,16 @@
+from pydantic import BaseModel, Field
 from agent.state import AgentState
-
 from llm.models import LlamaModel
 from llm.prompts import PromptManager
+from models.chunk import ParentChunk
 from retrieval.pipeline import RetrievalPipeline
-
 from web.search import DuckDuckGoSearch
+
+
+class GradeResult(BaseModel):
+    is_relevant: bool = Field(
+        description="True if the chunk contains information relevant to answering the question."
+    )
 
 
 class AgentNodes:
@@ -24,87 +30,122 @@ class AgentNodes:
         self,
         state: AgentState,
     ) -> AgentState:
-
         state["retrieved_parents"] = self.retrieval.retrieve(
             query=state["query"],
         )
-
         return state
 
     def grade_context(
         self,
         state: AgentState,
     ) -> AgentState:
+        retrieved = state.get("retrieved_parents", [])
+        if not retrieved:
+            state["relevant_parents"] = []
+            state["context_is_relevant"] = False
+            return state
 
-        context = "\n\n".join(chunk.text for chunk in state["retrieved_parents"])
+        relevant_parents: list[ParentChunk] = []
 
+        for chunk in retrieved:
+            system_prompt, user_prompt = self.prompts.get(
+                "grader",
+                context=chunk.text,
+                question=state["query"],
+            )
+            try:
+                grade = self.llm.generate_structured(
+                    system_prompt=system_prompt,
+                    user_prompt=user_prompt,
+                    response_model=GradeResult,
+                )
+                is_rel = grade.is_relevant
+            except Exception:
+                # Fallback to substring check if structured output fails
+                raw = (
+                    self.llm.generate(
+                        system_prompt=system_prompt,
+                        user_prompt=user_prompt,
+                        temperature=0.0,
+                    )
+                    .strip()
+                    .upper()
+                )
+                is_rel = "YES" in raw or "TRUE" in raw
+
+            if is_rel:
+                relevant_parents.append(chunk)
+
+        state["relevant_parents"] = relevant_parents
+        state["context_is_relevant"] = len(relevant_parents) > 0
+        return state
+
+    def rewrite_query(
+        self,
+        state: AgentState,
+    ) -> AgentState:
         system_prompt, user_prompt = self.prompts.get(
-            "grader",
-            context=context,
+            "query_rewriter",
             question=state["query"],
         )
+        rewritten = self.llm.generate(
+            system_prompt=system_prompt,
+            user_prompt=user_prompt,
+            max_new_tokens=64,
+            temperature=0.0,
+        ).strip(' "\'\n')
 
-        response = (
-            self.llm.generate(
-                system_prompt,
-                user_prompt,
-            )
-            .strip()
-            .upper()
-        )
-
-        if response == "YES":
-            state["context_is_relevant"] = True
-        elif response == "NO":
-            state["context_is_relevant"] = False
-        else:
-            raise ValueError(f"Invalid grader output: {response}")
-
+        state["search_query"] = rewritten if rewritten else state["query"]
         return state
 
     def web_search(
         self,
         state: AgentState,
     ) -> AgentState:
-
-        state["web_results"] = self.search_engine.search(
-            state["query"],
-        )
-
+        search_query = state.get("search_query") or state["query"]
+        state["web_results"] = self.search_engine.search(search_query)
         return state
 
     def build_context(
         self,
         state: AgentState,
     ) -> AgentState:
-
         context_parts: list[str] = []
 
-        context_parts.extend(chunk.text for chunk in state["retrieved_parents"])
-
-        context_parts.extend(
-            f"{result.title}\n{result.snippet}" for result in state["web_results"]
-        )
+        if state["context_is_relevant"]:
+            for chunk in state["relevant_parents"]:
+                filename = chunk.metadata.get("filename", chunk.document_id)
+                section = chunk.metadata.get("section_title", "")
+                header = (
+                    f""
+                    if section
+                    else f""
+                )
+                context_parts.append(f"{header}\n{chunk.text}")
+        else:
+            for result in state["web_results"]:
+                header = f""
+                context_parts.append(f"{header}\n{result.snippet}")
 
         state["retrieved_contexts"] = context_parts
         state["context"] = "\n\n".join(context_parts)
-
         return state
 
     def generate(
         self,
         state: AgentState,
     ) -> AgentState:
+        if not state["context"].strip():
+            state["answer"] = "I don't have enough information to answer that."
+            return state
 
         system_prompt, user_prompt = self.prompts.get(
             "generator",
             context=state["context"],
             question=state["query"],
         )
-
         state["answer"] = self.llm.generate(
-            system_prompt,
-            user_prompt,
+            system_prompt=system_prompt,
+            user_prompt=user_prompt,
         )
-
         return state
