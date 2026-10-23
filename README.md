@@ -19,7 +19,7 @@ A Corrective RAG (CRAG) pipeline that performs hybrid retrieval, reranking, cont
 # Output Example
 
 <p align="center">
-  <video src="https://github.com/user-attachments/assets/133b96c5-5bbc-4cb2-b635-e2b1c9d077ef" width="40%" controls></video>
+  <video src="https://github.com/user-attachments/assets/160b8300-e6b7-406a-8af9-7a632c98c0c8" width="40%" controls></video>
 </p>
 
 # Features
