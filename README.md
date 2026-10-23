@@ -14,13 +14,11 @@ A Corrective RAG (CRAG) pipeline that performs hybrid retrieval, reranking, cont
 - [Roadmap](#roadmap)
 
 # Architecture
-<img width="660" height="630" alt="Image" src="https://github.com/user-attachments/assets/d170bc45-523b-451c-9298-8bf88de1c09b" />
+<img width="528" height="504" alt="Image" src="https://github.com/user-attachments/assets/d170bc45-523b-451c-9298-8bf88de1c09b" />
 
 # Output Example
 
-<p align="center">
-  <video src="https://github.com/user-attachments/assets/160b8300-e6b7-406a-8af9-7a632c98c0c8" width="40%" controls></video>
-</p>
+https://github.com/user-attachments/assets/160b8300-e6b7-406a-8af9-7a632c98c0c8
 
 # Features
 - Local-first document question answering
