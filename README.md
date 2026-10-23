@@ -2,34 +2,27 @@
 
 A Corrective RAG (CRAG) pipeline that performs hybrid retrieval, reranking, context grading, and automatic web fallback to answer questions over your document collection.
 
----
+**Live Demo**: You can try the exact same project hosted on Hugging Face Spaces with a Gradio UI here: [Yet Another RAG on HF Spaces](https://huggingface.co/spaces/omsaindane/yet-another-rag)
 
 # Table of Contents
-
 - [Architecture](#architecture)
 - [Features](#features)
 - [Tech Stack](#tech-stack)
 - [Getting Started](#getting-started)
 - [Usage](#usage)
-- [API](#api)
+- [Design Decisions](#design-decisions)
 - [Roadmap](#roadmap)
 
----
-
 # Architecture
-
-<img width="1319" height="1260" alt="Image" src="https://github.com/user-attachments/assets/d170bc45-523b-451c-9298-8bf88de1c09b" />
-
----
+<img width="660" height="630" alt="Image" src="https://github.com/user-attachments/assets/d170bc45-523b-451c-9298-8bf88de1c09b" />
 
 # Output Example
 
-<img width="1902" height="965" alt="Image" src="https://github.com/user-attachments/assets/b9647d60-82b9-48de-a8fe-4621c457d1fa" />
-
----
+<p align="center">
+  <video src="https://github.com/user-attachments/assets/133b96c5-5bbc-4cb2-b635-e2b1c9d077ef" width="40%" controls></video>
+</p>
 
 # Features
-
 - Local-first document question answering
 - Corrective RAG (CRAG) workflow using LangGraph
 - Automatic document ingestion pipeline
@@ -44,15 +37,14 @@ A Corrective RAG (CRAG) pipeline that performs hybrid retrieval, reranking, cont
 - Automatic document change detection to avoid unnecessary re-indexing
 - Persistent Chroma vector database
 - Evaluation pipeline using DeepEval
-
----
+- Interactive Streaming CLI Chat
+- Local Streamlit Console UI & Hosted Gradio UI
 
 # Tech Stack
-
 | Component | Technology |
 |-----------|------------|
 | Parsing | Docling |
-| OCR | RapidOCR |
+| OCR | EasyOCR |
 | Chunking | Parent-Child Hierarchical Chunking |
 | Embeddings | BAAI/bge-small-en-v1.5 |
 | Vector Database | ChromaDB |
@@ -63,25 +55,17 @@ A Corrective RAG (CRAG) pipeline that performs hybrid retrieval, reranking, cont
 | Agent Framework | LangGraph |
 | Web Search | DuckDuckGo |
 | API | FastAPI |
+| UI | Streamlit / Gradio |
 | Evaluation | DeepEval |
 
-
----
-
 # Getting Started
-
 ## Prerequisites
-
 - Python 3.11+
 - Ollama
 - Git
 
----
-
 ## Installation
-
 Clone the repository
-
 ```bash
 git clone https://github.com/ommsaindane/yet-another-rag.git
 
@@ -126,22 +110,22 @@ Place your PDFs inside
 data/raw/
 ```
 
----
-
 # Usage
+
+The project provides a unified CLI via `main.py` to interact with the pipeline.
 
 ## API
 
 Start the server
 
 ```bash
-uvicorn app:app --reload
+python main.py serve --reload
 ```
 
 Swagger UI
 
 ```text
-http://127.0.0.1:8000/docs
+[http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 ```
 
 Example request
@@ -171,16 +155,56 @@ Example response
 }
 ```
 
----
+## UI
+
+Launch the local Streamlit console UI
+
+```bash
+python main.py ui
+```
+
+*Note: A hosted version of this project using a Gradio UI is also available on [Hugging Face Spaces](https://huggingface.co/spaces/omsaindane/yet-another-rag).*
+
+## CLI Chat
+
+Start an interactive streaming CLI chat session
+
+```bash
+python main.py chat
+```
+
+## Sync
+
+Incrementally sync `data/raw` with ChromaDB and JSON stores
+
+```bash
+python main.py sync
+```
+
+## Evaluation
+
+Run the DeepEval benchmark suite
+
+```bash
+python main.py eval
+
+https://github.com/user-attachments/assets/d70846cc-2fcf-4f8a-960b-3d4adb6f0cd7
+
+
+
+https://github.com/user-attachments/assets/9b456edd-70c6-4c9d-ad0a-c9f8e62d898d
+
+
+```
+
+*(Add `--fast` to run only Faithfulness and AnswerRelevancy for faster iteration)*
 
 # Design Decisions
 
-- Parent-child hierarchical chunking improves retrieval quality while providing larger context windows to the LLM.
-- Character-based chunking is used instead of page-based chunking, allowing chunks to span page boundaries. Because of this, page numbers are intentionally not exposed by the API.
-- Only child chunks are embedded and indexed, while parent chunks are stored separately and retrieved after reranking.
-- A manifest tracks document changes, preventing unnecessary parsing, chunking, and embedding on subsequent runs.
-
----
+* Parent-child hierarchical chunking improves retrieval quality while providing larger context windows to the LLM.
+* Character-based chunking is used instead of page-based chunking, allowing chunks to span page boundaries. Because of this, page numbers are intentionally not exposed by the API.
+* Only child chunks are embedded and indexed, while parent chunks are stored separately and retrieved after reranking.
+* A manifest tracks document changes, preventing unnecessary parsing, chunking, and embedding on subsequent runs.
 
 # Roadmap
 
@@ -191,9 +215,7 @@ Example response
 - [x] FastAPI REST API
 - [x] Automatic document change detection
 - [x] Evaluation pipeline
-- [ ] Streaming responses
-- [ ] Docker support
-- [ ] LangSmith integration
+- [x] Streaming responses
 - [ ] Multi-document collections
 - [ ] Citation highlighting
 - [ ] Authentication
