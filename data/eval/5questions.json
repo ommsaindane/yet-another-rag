@@ -1,0 +1,27 @@
+[
+  {
+    "id": 1,
+    "question": "What problem does G-RRM aim to solve?",
+    "expected_answer": "G-RRM combines recurrent reasoning models with symbolic solvers to improve search efficiency while preserving the correctness guarantees of symbolic solving."
+  },
+  {
+    "id": 2,
+    "question": "Why can't recurrent reasoning models guarantee correct solutions by themselves?",
+    "expected_answer": "RRMs generate complete solution proposals through learned iterative refinement but do not perform deductive reasoning or logical verification, so they may produce constraint-violating solutions."
+  },
+  {
+    "id": 3,
+    "question": "What role does the SE-RRM play in G-RRM?",
+    "expected_answer": "The SE-RRM predicts probability distributions over candidate assignments that guide the search order of symbolic solvers."
+  },
+  {
+    "id": 4,
+    "question": "Why is Sudoku used as the benchmark in this work?",
+    "expected_answer": "Sudoku is a well-established combinatorial constraint satisfaction benchmark with simple rules but computationally difficult search, making it suitable for evaluating neuro-symbolic methods."
+  },
+  {
+    "id": 5,
+    "question": "How does G-RRM preserve solver correctness?",
+    "expected_answer": "The neural model only changes the search order while the symbolic solver still explores all feasible assignments, preserving completeness and correctness."
+  }
+]

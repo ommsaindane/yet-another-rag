@@ -25,7 +25,7 @@ class Settings(BaseSettings):
     # ----------------------------
     # Models & Hosts
     # ----------------------------
-    llm_model: str = "llama3.2:3b"
+    llm_model: str = "qwen2.5:3b"
     ollama_host: str = "http://localhost:11434"
     embedding_model: str = "BAAI/bge-small-en-v1.5"
     embedding_batch_size: int = 64

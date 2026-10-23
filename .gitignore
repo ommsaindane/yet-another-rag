@@ -12,6 +12,7 @@ wheels/
 #data 
 data/raw/*
 data/chroma/*
+.deepeval/
 
 #dotenv
 .env

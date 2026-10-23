@@ -1,5 +1,4 @@
 from collections.abc import Iterator
-from typing import Any
 from langgraph.graph import END, START, StateGraph
 from agent.nodes import AgentNodes
 from agent.router import AgentRouter
@@ -79,10 +78,6 @@ class CRAGGraph:
         self,
         query: str,
     ) -> AgentState:
-        """
-        Executes retrieval, grading, and optional web fallback up to build_context,
-        returning the populated AgentState ready for streaming generation.
-        """
         state = self._initial_state(query)
         state = self.nodes.retrieve(state)
         state = self.nodes.grade_context(state)
@@ -96,9 +91,6 @@ class CRAGGraph:
         self,
         query: str,
     ) -> tuple[AgentState, Iterator[str]]:
-        """
-        Prepares the CRAG context and returns (state, token_iterator) for SSE streaming.
-        """
         state = self.prepare_context(query)
 
         if not state["context"].strip():

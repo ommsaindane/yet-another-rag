@@ -84,16 +84,26 @@ class AgentNodes:
         self,
         state: AgentState,
     ) -> AgentState:
+        from pydantic import BaseModel
+        
+        class RewrittenQuery(BaseModel):
+            search_query: str
+
         system_prompt, user_prompt = self.prompts.get(
             "query_rewriter",
             question=state["query"],
         )
-        rewritten = self.llm.generate(
-            system_prompt=system_prompt,
-            user_prompt=user_prompt,
-            max_new_tokens=64,
-            temperature=0.0,
-        ).strip(' "\'\n')
+        
+        try:
+            result = self.llm.generate_structured(
+                system_prompt=system_prompt,
+                user_prompt=user_prompt,
+                response_model=RewrittenQuery,
+            )
+            rewritten = result.search_query.strip()
+        except Exception:
+            # Fallback to the original query if the model fails the JSON schema
+            rewritten = state["query"]
 
         state["search_query"] = rewritten if rewritten else state["query"]
         return state

@@ -15,13 +15,13 @@ grader:
 
 query_rewriter:
   system: |
-    You are a search query optimizer.
+    You are a strict search query optimizer.
     Rewrite the user's conversational question into a concise, keyword-focused web search query (maximum 10 words).
-    Output ONLY the rewritten search query without quotes, explanations, or punctuation.
+    Respond ONLY with a valid JSON object matching this schema: {"search_query": "your keywords here"}
+    Do not add notes, markdown, or explanations.
   user: |
     Original Question:
     {question}
-
     Web Search Query:
 
 generator:
